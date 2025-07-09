@@ -1,3 +1,7 @@
+:root {
+    --ca-theme-color: #e63946;
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
