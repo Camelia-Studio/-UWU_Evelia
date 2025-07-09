@@ -47,7 +47,7 @@ function camelianime_events_shortcode(): string {
 			{$event['name']}
 		</div>
 		<div class="ca-event-actions">
-			<a href="{$discordBase}?event={$event['id']}" class="ca-btn" target="_blank"><i class="fas fa-sign-in-alt"></i> S'inscrire à la séance</a>
+			<a href="{$discordBase}?event={$event['id']}" class="ca-btn" target="_blank"><i class="fas fa-sign-in-alt"></i> S'inscrire !</a>
 		</div>
 	</div>
 EOD;
