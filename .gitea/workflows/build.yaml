@@ -76,6 +76,6 @@ jobs:
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: CameliaStudio-*.zip
+          files: "$GITHUB_WORKSPACE/*.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
