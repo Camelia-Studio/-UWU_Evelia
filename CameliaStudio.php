@@ -16,28 +16,70 @@
 
 // On ajoute un shortcode pour afficher la liste des évènements
 
-function camelianime_events_shortcode(): string {
-	$discordBase = 'https://discord.gg/nBuZ9vJ';
-	// On récupère les évènements depuis l'API
-	$response = wp_remote_get( 'https://git.crystalyx.net/camelia-studio/Camelia-Studio-WP/raw/branch/master/sample.json', [
-		'timeout' => 10,
-	] );
+function get_events_from_discord(): array
+{
+    $cache_key = 'camelianime_events_cache';
+    $cache_duration = 12 * HOUR_IN_SECONDS; // 12 heures
 
-	if ( is_wp_error( $response ) ) {
-		return '<p>Erreur lors de la récupération des évènements.</p>';
-	}
+    // Vérifier si les données sont en cache
+    $cached_data = get_transient($cache_key);
 
-	$events = json_decode( wp_remote_retrieve_body( $response ), true );
+    if ($cached_data !== false) {
+        return $cached_data;
+    }
 
-	if ( empty( $events ) ) {
-		return '<p>Aucun évènement trouvé.</p>';
-	}
+    $discordBotToken = get_option('discord_bot_token', '');
+    $discordGuildId = get_option('discord_guild_id', '');
+    if ('' === $discordBotToken || '' === $discordGuildId) {
+        return [];
+    }
+    // On récupère les évènements depuis l'API
+    $response = wp_remote_get("https://discord.com/api/v10/guilds/" . $discordGuildId . "/scheduled-events?with_user_count=true", [
+        'timeout' => 10,
+        'headers' => [
+            'Accept' => 'application/json',
+            'Authorization' => 'Bot ' . $discordBotToken,
+        ],
+    ]);
 
-	// On construit le HTML pour afficher les évènements
-	$html = '<div class="ca-calendar-container">';
-	foreach ( $events as $event ) {
-		$formattedDate = date( 'd/m/Y - H:i', strtotime( $event['scheduled_start_time'] ) );
-		$html          .= <<<EOD
+    if (is_wp_error($response)) {
+        return [];
+    }
+
+    $events = json_decode(wp_remote_retrieve_body($response), true);
+
+    if (isset($events['message'])) {
+        return [];
+    }
+
+    set_transient($cache_key, $events, $cache_duration);
+
+    return $events;
+}
+
+/**
+ * @throws Exception
+ */
+function camelianime_events_shortcode(): string
+{
+    $discordBase = get_option('discord_invite_url', '');
+
+    if ('' === $discordBase) {
+        return '<p>Aucun évènement trouvé.</p>';
+    }
+    $events = get_events_from_discord();
+
+
+    if (sizeof($events) == 0) {
+        return '<p>Aucun évènement trouvé.</p>';
+    }
+
+    $html = '<div class="ca-calendar-container">';
+    foreach ($events as $event) {
+        $date = new DateTime($event['scheduled_start_time']);
+        $date->setTimezone(new DateTimeZone('Europe/Paris'));
+        $formattedDate = $date->format('d/m/Y H:i');
+        $html .= <<<EOD
 <div class="ca-event-card">
 	<div class="ca-event-details">
 		<div class="ca-event-date">
@@ -51,31 +93,32 @@ function camelianime_events_shortcode(): string {
 		</div>
 	</div>
 EOD;
-		if ( ! empty( $event['image'] ) ) {
-			$html          .= <<<EOD
-		<img src="{$event['image']}" alt="{$event['name']}" class="ca-event-image" />
+        if (!empty($event['image'])) {
+            $html .= <<<EOD
+		<img src="https://cdn.discordapp.com/guild-events/{$event['id']}/{$event['image']}.png?size=256" alt="{$event['name']}" class="ca-event-image" />
 EOD;
 
-		}
-		$html .= '</div>';
-	}
-	$html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+    $html .= '</div>';
 
-	return $html;
+    return $html;
 }
 
 function loadAssets(): void
 {
-	wp_enqueue_style(
-		'camelianime-events-style',
-		plugin_dir_url( __FILE__ ) . 'assets/css/calendar.css'
-	);
+    wp_enqueue_style(
+        'camelianime-events-style',
+        plugin_dir_url(__FILE__) . 'assets/css/calendar.css'
+    );
 }
 
-add_action( 'wp_enqueue_scripts', 'loadAssets' );
-add_shortcode( 'camelianime_events', 'camelianime_events_shortcode' );
+add_action('wp_enqueue_scripts', 'loadAssets');
+add_shortcode('camelianime_events', 'camelianime_events_shortcode');
 
-function cameliastudio_administration_add_admin_page() {
+function cameliastudio_administration_add_admin_page()
+{
     add_submenu_page(
         'options-general.php',
         'Options de Camélia Studio',
@@ -86,8 +129,9 @@ function cameliastudio_administration_add_admin_page() {
     );
 }
 
-function administration_page() {
-    $options = [
+function administration_page()
+{
+    $colorsOptions = [
         'ca_event_title_color' => [
             'value' => get_option('ca_event_title_color', '#e63946'),
             'label' => 'Couleur du titre des évènements',
@@ -125,13 +169,38 @@ function administration_page() {
         ],
     ];
 
+    $discordOptions = [
+        'discord_bot_token' => [
+            'value' => get_option('discord_bot_token', ''),
+            'label' => 'Token du bot Discord',
+            'type' => 'text',
+        ],
+        'discord_invite_url' => [
+            'value' => get_option('discord_invite_url', ''),
+            'label' => 'URL d\'invitation Discord',
+            'type' => 'url',
+        ],
+        'discord_guild_id' => [
+            'value' => get_option('discord_guild_id', ''),
+            'label' => 'ID du serveur Discord',
+            'type' => 'text',
+        ],
+    ];
+
 
     if (isset($_POST['submit'])) {
-        // On met à jour les options
-        foreach ($options as $option_name => $option_data) {
+        // On met à jour les colorsOptions
+        foreach ($colorsOptions as $option_name => $option_data) {
             if (isset($_POST[$option_name])) {
                 update_option($option_name, sanitize_text_field($_POST[$option_name]));
-                $options[$option_name]['value'] = sanitize_text_field($_POST[$option_name]);
+                $colorsOptions[$option_name]['value'] = sanitize_text_field($_POST[$option_name]);
+            }
+        }
+
+        foreach ($discordOptions as $option_name => $option_data) {
+            if (isset($_POST[$option_name])) {
+                update_option($option_name, sanitize_text_field($_POST[$option_name]));
+                $discordOptions[$option_name]['value'] = sanitize_text_field($_POST[$option_name]);
             }
         }
         echo '<div class="updated"><p>Options enregistrées avec succès !</p></div>';
@@ -140,12 +209,12 @@ function administration_page() {
     ?>
     <div class="wrap">
         <h1>Configuration du plugin Camélia Studio</h1>
-        <h2 class="title">Gestion des couleurs</h2>
         <form method="post" action="">
+            <h2 class="title">Gestion des informations Discord</h2>
             <table class="form-table">
                 <tbody>
                 <?php
-                foreach ($options as $option_name => $option_data) {
+                foreach ($discordOptions as $option_name => $option_data) {
                     ?>
                     <tr>
                         <th>
@@ -156,7 +225,30 @@ function administration_page() {
                                    id="<?php echo esc_attr($option_name); ?>"
                                    name="<?php echo esc_attr($option_name); ?>"
                                    value="<?php echo esc_attr($option_data['value']); ?>"
-                                   class="regular-text" />
+                                   class="regular-text"/>
+                        </td>
+                    </tr>
+                    <?php
+                }
+                ?>
+                </tbody>
+            </table>
+            <h2 class="title">Gestion des couleurs</h2>
+            <table class="form-table">
+                <tbody>
+                <?php
+                foreach ($colorsOptions as $option_name => $option_data) {
+                    ?>
+                    <tr>
+                        <th>
+                            <label for="<?php echo esc_attr($option_name); ?>"><?php echo esc_html($option_data['label']); ?></label>
+                        </th>
+                        <td>
+                            <input type="<?php echo esc_attr($option_data['type']); ?>"
+                                   id="<?php echo esc_attr($option_name); ?>"
+                                   name="<?php echo esc_attr($option_name); ?>"
+                                   value="<?php echo esc_attr($option_data['value']); ?>"
+                                   class="regular-text"/>
                         </td>
                     </tr>
                     <?php
@@ -165,7 +257,7 @@ function administration_page() {
                 <tr>
                     <th></th>
                     <td>
-                        <input type="submit" name="submit" class="button button-primary" value="Enregistrer" />
+                        <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
                     </td>
                 </tr>
                 </tbody>
@@ -176,7 +268,8 @@ function administration_page() {
     <?php
 }
 
-function add_colors_to_website() {
+function add_colors_to_website()
+{
     $caEventTitleColor = get_option('ca_event_title_color', '#e63946');
     $btnBackground = get_option('btn_background', '#e63946');
     $cardBackgroundColor = get_option('card_background_color', '#2c2f33');
@@ -187,9 +280,9 @@ function add_colors_to_website() {
     ?>
     <style>
         :root {
-            --ca-event-title-color:  <?php echo esc_attr($caEventTitleColor); ?>;
+            --ca-event-title-color: <?php echo esc_attr($caEventTitleColor); ?>;
             --card-background-color: <?php echo esc_attr($cardBackgroundColor); ?>;
-            --button-foreground:  <?php echo esc_attr($buttonForeground); ?>;
+            --button-foreground: <?php echo esc_attr($buttonForeground); ?>;
             --btn-background: <?php echo esc_attr($btnBackground); ?>;
             --btn-background-hover: <?php echo esc_attr($btnBackgroundHover); ?>;
             --btn-foreground-hover: <?php echo esc_attr($btnForegroundHover); ?>;
