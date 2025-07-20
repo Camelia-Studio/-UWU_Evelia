@@ -30,6 +30,7 @@ function get_events_from_discord(): array
 
     $discordBotToken = get_option('discord_bot_token', '');
     $discordGuildId = get_option('discord_guild_id', '');
+    $wordToSearch = get_option('discord_word_to_search', '');
     if ('' === $discordBotToken || '' === $discordGuildId) {
         return [];
     }
@@ -50,6 +51,13 @@ function get_events_from_discord(): array
 
     if (isset($events['message'])) {
         return [];
+    }
+
+    // Filtrer les évènements qui contiennent le mot-clé
+    if ('' !== $wordToSearch) {
+        $events = array_filter($events, function ($event) use ($wordToSearch) {
+            return stripos($event['description'], $wordToSearch) !== false;
+        });
     }
 
     set_transient($cache_key, $events, $cache_duration);
@@ -183,6 +191,11 @@ function administration_page()
         'discord_guild_id' => [
             'value' => get_option('discord_guild_id', ''),
             'label' => 'ID du serveur Discord',
+            'type' => 'text',
+        ],
+        'discord_word_to_search' => [
+            'value' => get_option('discord_word_to_search', ''),
+            'label' => 'Mot à rechercher dans la description des évènements (laisser vide pour tous les évènements)',
             'type' => 'text',
         ],
     ];
