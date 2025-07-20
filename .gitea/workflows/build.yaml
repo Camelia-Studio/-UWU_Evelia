@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wordpress-plugin
-          path: "$GITHUB_WORKSPACE/*.zip"
+          path: "*.zip"
           retention-days: 30
 
       # Publier sur release
@@ -76,6 +76,6 @@ jobs:
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: "$GITHUB_WORKSPACE/*.zip"
+          files: "*.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
