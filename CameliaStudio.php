@@ -18,7 +18,14 @@
 
 function get_events_from_discord(): array
 {
-    $cache_key = 'camelianime_events_cache';
+    $discordBotToken = get_option('discord_bot_token', '');
+    $discordGuildId = get_option('discord_guild_id', '');
+    $wordToSearch = get_option('discord_word_to_search', '');
+    if ('' === $discordBotToken || '' === $discordGuildId) {
+        return [];
+    }
+
+    $cache_key = 'camelianime_events_cache_' . md5($discordGuildId . $wordToSearch);
     $cache_duration = 12 * HOUR_IN_SECONDS; // 12 heures
 
     // Vérifier si les données sont en cache
@@ -26,13 +33,6 @@ function get_events_from_discord(): array
 
     if ($cached_data !== false) {
         return $cached_data;
-    }
-
-    $discordBotToken = get_option('discord_bot_token', '');
-    $discordGuildId = get_option('discord_guild_id', '');
-    $wordToSearch = get_option('discord_word_to_search', '');
-    if ('' === $discordBotToken || '' === $discordGuildId) {
-        return [];
     }
     // On récupère les évènements depuis l'API
     $response = wp_remote_get("https://discord.com/api/v10/guilds/" . $discordGuildId . "/scheduled-events?with_user_count=true", [
