@@ -1,0 +1,81 @@
+name: Build WordPress Plugin
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get plugin info
+        id: plugin_info
+        run: |
+          # Extraire les infos depuis CameliaStudio.php
+          PLUGIN_SLUG="CameliaStudio"
+          PLUGIN_VERSION=$(grep "Version:" CameliaStudio.php | sed 's/.*Version: *//' | sed 's/ *$//' | tr -d '\r')
+          
+          echo "slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT
+          echo "version=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
+          
+          echo "Plugin: $PLUGIN_SLUG"
+          echo "Version: $PLUGIN_VERSION"
+
+      - name: Create WordPress plugin zip
+        run: |
+          PLUGIN_SLUG="${{ steps.plugin_info.outputs.slug }}"
+          PLUGIN_VERSION="${{ steps.plugin_info.outputs.version }}"
+          
+          # Créer un dossier temporaire avec le nom du plugin
+          mkdir -p "/tmp/$PLUGIN_SLUG"
+          
+          # Copier les fichiers du plugin
+          cp CameliaStudio.php "/tmp/$PLUGIN_SLUG/"
+          
+          # Copier le dossier assets s'il existe
+          if [ -d "assets" ]; then
+            cp -r assets "/tmp/$PLUGIN_SLUG/"
+          fi
+          
+          # Copier le dossier src s'il existe
+          if [ -d "src" ]; then
+            cp -r src "/tmp/$PLUGIN_SLUG/"
+          fi
+          
+          # Copier d'autres fichiers optionnels s'ils existent
+          for file in README.md languages; do
+            if [ -e "$file" ]; then
+              cp -r "$file" "/tmp/$PLUGIN_SLUG/"
+            fi
+          done
+          
+          # Créer le zip
+          cd /tmp
+          zip -r "$GITHUB_WORKSPACE/$PLUGIN_SLUG-$PLUGIN_VERSION.zip" "$PLUGIN_SLUG/"
+          
+          echo "Created: $PLUGIN_SLUG-$PLUGIN_VERSION.zip"
+          ls -la "$GITHUB_WORKSPACE/"*.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordpress-plugin
+          path: "CameliaStudio-*.zip"
+          retention-days: 30
+
+      # Publier sur release
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: CameliaStudio-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
