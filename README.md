@@ -4,7 +4,7 @@ Un plugin WordPress pour afficher et gérer les événements Discord directement
 
 ## Description
 
-Le plugin Camélia Studio permet d'intégrer facilement les événements programmés de votre serveur Discord sur votre site WordPress. Il récupère automatiquement les événements via l'API Discord et les affiche avec un design personnalisable.
+Le plugin Évélia permet d'intégrer facilement les événements programmés de votre serveur Discord sur votre site WordPress. Il récupère automatiquement les événements via l'API Discord et les affiche avec un design personnalisable.
 
 ## Fonctionnalités
 
@@ -27,13 +27,13 @@ Le plugin Camélia Studio permet d'intégrer facilement les événements program
 
 1. Téléchargez le plugin et téléversez-le depuis la page "Extensions" de WordPress
 2. Activez le plugin via le menu "Plugins" de WordPress
-3. Configurez le plugin via "Réglages" > "Camélia Studio"
+3. Configurez le plugin via "Réglages" > "Évélia"
 
 ## Configuration
 
 ### 1. Configuration Discord
 
-Rendez-vous dans **Réglages > Camélia Studio** et configurez :
+Rendez-vous dans **Réglages > Évélia** et configurez :
 
 - **Token du bot Discord** : Le token de votre bot Discord
 - **URL d'invitation Discord** : L'URL d'invitation de votre serveur Discord
@@ -74,8 +74,8 @@ Le plugin génère automatiquement des cartes d'événements contenant :
 ## Structure des fichiers
 
 ```
-camelia-studio/
-├── CameliaStudio.php          # Fichier principal du plugin
+evelia/
+├── evelia.php          # Fichier principal du plugin
 ├── assets/
 │   └── css/
 │       └── calendar.css       # Styles pour l'affichage des événements
