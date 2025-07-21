@@ -75,7 +75,7 @@ Le plugin génère automatiquement des cartes d'événements contenant :
 
 ```
 evelia/
-├── evelia.php          # Fichier principal du plugin
+├── Evelia.php          # Fichier principal du plugin
 ├── assets/
 │   └── css/
 │       └── calendar.css       # Styles pour l'affichage des événements
