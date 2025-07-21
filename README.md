@@ -1,6 +1,6 @@
-# Camélia Studio - Plugin WordPress
+# UWU Évélia
 
-Un plugin WordPress pour afficher et gérer les événements Discord directement sur votre site web.
+Un plugin WordPress pour afficher et gérer les événements Discord directement sur votre site web Wordpress.
 
 ## Description
 
@@ -155,7 +155,7 @@ En cas d'erreur, le message "Aucun évènement trouvé." est affiché.
 
 Pour toute question ou problème :
 
-- Repo Gitea : [https://git.crystalyx.net/camelia-studio/Camelia-Studio-WP](https://git.crystalyx.net/camelia-studio/Camelia-Studio-WP)
+- Repo Gitea : [https://git.crystalyx.net/camelia-studio/UWU_Evelia](https://git.crystalyx.net/camelia-studio/UWU_Evelia)
 - Site web : [https://camelia-studio.org](https://camelia-studio.org)
 - Version : 1.0.0
 
