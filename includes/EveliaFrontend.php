@@ -10,7 +10,7 @@ class EveliaFrontend
 
     private function __construct()
     {
-        add_shortcode('camelianime_events', array($this, 'eventsShortcode'));
+        add_shortcode('evelia_events', array($this, 'eventsShortcode'));
     }
 
     public static function getInstance(): ?EveliaFrontend

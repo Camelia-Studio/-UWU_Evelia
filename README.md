@@ -59,7 +59,7 @@ Le plugin permet de personnaliser :
 Utilisez le shortcode suivant pour afficher les événements sur vos pages ou articles :
 
 ```
-[camelianime_events]
+[evelia_events]
 ```
 
 ### Exemple d'affichage
