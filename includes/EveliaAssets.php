@@ -40,10 +40,10 @@ class EveliaAssets
      */
     public function addCustomCssVariables()
     {
-        $css_vars = $this->getCssVariables();
+        $cssVars = $this->getCssVariables();
 
         echo '<style>:root {';
-        foreach ($css_vars as $property => $value) {
+        foreach ($cssVars as $property => $value) {
             echo esc_attr($property) . ': ' . esc_attr($value) . ';';
         }
         echo '}</style>';

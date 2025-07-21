@@ -11,8 +11,8 @@ class EveliaMain
 
     private function __construct()
     {
-        $this->load_dependencies();
-        $this->init_hooks();
+        $this->loadDependencies();
+        $this->initHooks();
     }
 
     public static function getInstance(): ?EveliaMain
@@ -23,7 +23,7 @@ class EveliaMain
         return self::$instance;
     }
 
-    private function load_dependencies(): void
+    private function loadDependencies(): void
     {
         require_once EVELIA_PLUGIN_DIR . 'includes/EveliaDiscordApi.php';
         require_once EVELIA_PLUGIN_DIR . 'includes/EveliaFrontend.php';
@@ -39,7 +39,7 @@ class EveliaMain
         EveliaAssets::getInstance();
     }
 
-    private function init_hooks(): void
+    private function initHooks(): void
     {
         add_action('init', array($this, 'loadTextdomain'));
     }

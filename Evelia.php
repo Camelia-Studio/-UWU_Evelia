@@ -28,7 +28,7 @@ define('EVELIA_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once EVELIA_PLUGIN_DIR . 'includes/EveliaMain.php';
 
 // Initialiser le plugin
-function evelia_init() {
+function eveliaInit() {
     EveliaMain::getInstance();
 }
-add_action('plugins_loaded', 'evelia_init');
+add_action('plugins_loaded', 'eveliaInit');
