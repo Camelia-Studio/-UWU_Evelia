@@ -45,9 +45,14 @@ jobs:
             cp -r assets "/tmp/$PLUGIN_SLUG/"
           fi
           
-          # Copier le dossier src s'il existe
-          if [ -d "src" ]; then
-            cp -r src "/tmp/$PLUGIN_SLUG/"
+          # Copier le dossier includes s'il existe
+          if [ -d "includes" ]; then
+            cp -r includes "/tmp/$PLUGIN_SLUG/"
+          fi
+          
+          # Copier le dossier admin s'il existe
+          if [ -d "admin" ]; then
+            cp -r admin "/tmp/$PLUGIN_SLUG/"
           fi
           
           # Copier d'autres fichiers optionnels s'ils existent
