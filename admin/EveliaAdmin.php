@@ -12,6 +12,7 @@ class EveliaAdmin
     private function __construct()
     {
         add_action('admin_menu', array($this, 'addAdminMenu'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueueAdminAssets'));
     }
 
     public static function getInstance(): ?EveliaAdmin
@@ -34,6 +35,25 @@ class EveliaAdmin
             'manage_options',
             'evelia-settings',
             array($this, 'settingsPage')
+        );
+    }
+
+    /**
+     * Charge les assets admin
+     */
+    public function enqueueAdminAssets(string $hook): void
+    {
+        // Charger uniquement sur la page des paramètres Evelia
+        if ('settings_page_evelia-settings' !== $hook) {
+            return;
+        }
+
+        // Charger le CSS du calendrier pour l'aperçu
+        wp_enqueue_style(
+            'evelia-calendar-preview',
+            EVELIA_PLUGIN_URL . 'assets/css/calendar.css',
+            array(),
+            EVELIA_VERSION
         );
     }
 

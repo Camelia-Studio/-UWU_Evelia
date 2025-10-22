@@ -285,34 +285,145 @@ class EveliaSettings {
      */
     private function renderColorsSection(): void
     {
+        $currentLayout = get_option('evelia_card_layout', 'horizontal');
+        $layoutClass = $currentLayout === 'vertical' ? 'vertical' : '';
+        $containerClass = $currentLayout === 'vertical' ? 'ca-calendar-container has-vertical-layout' : 'ca-calendar-container';
         ?>
         <h2 class="title">Gestion des couleurs</h2>
-        <table class="form-table">
-            <tbody>
-            <?php foreach ($this->colorsOptions as $optionName => $optionData): ?>
-                <tr>
-                    <th>
-                        <label for="<?php echo esc_attr($optionName); ?>">
-                            <?php echo esc_html($optionData['label']); ?>
-                        </label>
-                    </th>
-                    <td>
-                        <input type="<?php echo esc_attr($optionData['type']); ?>"
-                               id="<?php echo esc_attr($optionName); ?>"
-                               name="<?php echo esc_attr($optionName); ?>"
-                               value="<?php echo esc_attr($optionData['value']); ?>"
-                               class="regular-text"/>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            <tr>
-                <th></th>
-                <td>
-                    <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <p>Modifiez les couleurs et visualisez le résultat en temps réel à droite.</p>
+
+        <style>
+            .evelia-color-layout {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+                margin: 2rem 0;
+            }
+            .evelia-color-options {
+                min-width: 0;
+            }
+            .color-preview-section {
+                background: #f5f5f5;
+                padding: 2rem;
+                border-radius: 8px;
+                position: sticky;
+                top: 32px;
+                height: fit-content;
+            }
+            .color-preview-section h3 {
+                margin-top: 0;
+                margin-bottom: 1rem;
+            }
+            #evelia-preview-container {
+                max-width: 100%;
+            }
+            #evelia-preview-container .ca-calendar-container {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+            #evelia-preview-container .ca-calendar-container.has-vertical-layout {
+                max-width: 100%;
+            }
+            #evelia-preview-container .ca-event-card {
+                margin: 0 auto;
+            }
+            #evelia-preview-container .ca-event-card:not(.vertical) {
+                max-width: 100%;
+            }
+            @media (max-width: 1200px) {
+                .evelia-color-layout {
+                    grid-template-columns: 1fr;
+                }
+                .color-preview-section {
+                    position: static;
+                }
+            }
+        </style>
+
+        <div class="evelia-color-layout">
+            <div class="evelia-color-options">
+                <table class="form-table">
+                    <tbody>
+                    <?php foreach ($this->colorsOptions as $optionName => $optionData): ?>
+                        <tr>
+                            <th>
+                                <label for="<?php echo esc_attr($optionName); ?>">
+                                    <?php echo esc_html($optionData['label']); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <input type="<?php echo esc_attr($optionData['type']); ?>"
+                                       id="<?php echo esc_attr($optionName); ?>"
+                                       name="<?php echo esc_attr($optionName); ?>"
+                                       value="<?php echo esc_attr($optionData['value']); ?>"
+                                       class="regular-text color-input"
+                                       data-css-var="--<?php echo esc_attr(str_replace('_', '-', $optionName)); ?>"/>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <th></th>
+                        <td>
+                            <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="color-preview-section">
+                <h3>Aperçu en direct</h3>
+                <div id="evelia-preview-container" style="
+                --block-background-color: <?php echo esc_attr(get_option('block_background_color', 'transparent')); ?>;
+                --block-title-color: <?php echo esc_attr(get_option('block_title_color', '#e63946')); ?>;
+                --block-description-color: <?php echo esc_attr(get_option('block_description_color', '#d0d0d0')); ?>;
+                --ca-event-title-color: <?php echo esc_attr(get_option('ca_event_title_color', '#e63946')); ?>;
+                --card-background-color: <?php echo esc_attr(get_option('card_background_color', '#2c2f33')); ?>;
+                --button-foreground: <?php echo esc_attr(get_option('button_foreground', '#23272a')); ?>;
+                --btn-background: <?php echo esc_attr(get_option('btn_background', '#e63946')); ?>;
+                --btn-background-hover: <?php echo esc_attr(get_option('btn_background_hover', '#FFD55F')); ?>;
+                --btn-foreground-hover: <?php echo esc_attr(get_option('btn_foreground_hover', '#23272a')); ?>;
+                --event-date-color: <?php echo esc_attr(get_option('event_date_color', '#d0d0d0')); ?>;
+            ">
+                <div class="<?php echo esc_attr($containerClass); ?>" id="preview-calendar">
+                    <h2 class="ca-calendar-title">Titre du bloc d'événements</h2>
+                    <p class="ca-calendar-description">Description du bloc d'événements</p>
+                    <div class="ca-event-card <?php echo esc_attr($layoutClass); ?>">
+                        <div class="ca-event-details">
+                            <div class="ca-event-date">
+                                <i class="fas fa-calendar-alt"></i> 25/12/2024 20:00
+                            </div>
+                            <div class="ca-event-title">
+                                Exemple d'événement
+                            </div>
+                            <div class="ca-event-actions">
+                                <a href="#" class="ca-btn" onclick="return false;">
+                                    <i class="fas fa-sign-in-alt"></i> S'inscrire !
+                                </a>
+                            </div>
+                        </div>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 250'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea'/%3E%3Cstop offset='100%25' style='stop-color:%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='400' height='250'/%3E%3C/svg%3E"
+                             alt="Exemple"
+                             class="ca-event-image" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const colorInputs = document.querySelectorAll('.color-input');
+                const previewContainer = document.getElementById('evelia-preview-container');
+
+                colorInputs.forEach(function(input) {
+                    input.addEventListener('input', function() {
+                        const cssVar = this.getAttribute('data-css-var');
+                        const value = this.value;
+                        previewContainer.style.setProperty(cssVar, value);
+                    });
+                });
+            });
+        </script>
         <?php
     }
 
