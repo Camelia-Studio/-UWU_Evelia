@@ -19,6 +19,21 @@ class EveliaSettings {
     private function initOptions(): void
     {
         $this->colorsOptions = [
+            'block_background_color' => [
+                'value' => get_option('block_background_color', 'transparent'),
+                'label' => 'Couleur de fond du bloc d\'événements',
+                'type' => 'color',
+            ],
+            'block_title_color' => [
+                'value' => get_option('block_title_color', '#e63946'),
+                'label' => 'Couleur du titre du bloc d\'événements',
+                'type' => 'color',
+            ],
+            'block_description_color' => [
+                'value' => get_option('block_description_color', '#d0d0d0'),
+                'label' => 'Couleur de la description du bloc',
+                'type' => 'color',
+            ],
             'ca_event_title_color' => [
                 'value' => get_option('ca_event_title_color', '#e63946'),
                 'label' => 'Couleur du titre des évènements',
@@ -80,6 +95,16 @@ class EveliaSettings {
         ];
 
         $this->textOptions = [
+            'evelia_block_title' => [
+                'value' => get_option('evelia_block_title', ''),
+                'label' => 'Titre du bloc d\'événements (optionnel)',
+                'type' => 'text',
+            ],
+            'evelia_block_description' => [
+                'value' => get_option('evelia_block_description', ''),
+                'label' => 'Description du bloc d\'événements (optionnel)',
+                'type' => 'textarea',
+            ],
             'evelia_button_text' => [
                 'value' => get_option('evelia_button_text', 'S\'inscrire !'),
                 'label' => 'Texte du bouton d\'inscription',
@@ -282,11 +307,18 @@ class EveliaSettings {
                         </label>
                     </th>
                     <td>
-                        <input type="<?php echo esc_attr($optionData['type']); ?>"
-                               id="<?php echo esc_attr($optionName); ?>"
-                               name="<?php echo esc_attr($optionName); ?>"
-                               value="<?php echo esc_attr($optionData['value']); ?>"
-                               class="regular-text"/>
+                        <?php if ($optionData['type'] === 'textarea'): ?>
+                            <textarea id="<?php echo esc_attr($optionName); ?>"
+                                      name="<?php echo esc_attr($optionName); ?>"
+                                      rows="4"
+                                      class="large-text"><?php echo esc_textarea($optionData['value']); ?></textarea>
+                        <?php else: ?>
+                            <input type="<?php echo esc_attr($optionData['type']); ?>"
+                                   id="<?php echo esc_attr($optionName); ?>"
+                                   name="<?php echo esc_attr($optionName); ?>"
+                                   value="<?php echo esc_attr($optionData['value']); ?>"
+                                   class="regular-text"/>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -51,7 +51,20 @@ class EveliaFrontend
     private function renderEventsHtml(array $events, string $discordBase): string
     {
         $buttonText = get_option('evelia_button_text', 'S\'inscrire !');
+        $blockTitle = get_option('evelia_block_title', '');
+        $blockDescription = get_option('evelia_block_description', '');
+
         $html = '<div class="ca-calendar-container">';
+
+        // Afficher le titre si présent
+        if (!empty($blockTitle)) {
+            $html .= '<h2 class="ca-calendar-title">' . esc_html($blockTitle) . '</h2>';
+        }
+
+        // Afficher la description si présente
+        if (!empty($blockDescription)) {
+            $html .= '<p class="ca-calendar-description">' . esc_html($blockDescription) . '</p>';
+        }
 
         foreach ($events as $event) {
             $date = new DateTime($event['scheduled_start_time']);

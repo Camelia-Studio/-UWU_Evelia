@@ -55,6 +55,9 @@ class EveliaAssets
     private function getCssVariables(): array
     {
         return [
+            '--block-background-color' => get_option('block_background_color', 'transparent'),
+            '--block-title-color' => get_option('block_title_color', '#e63946'),
+            '--block-description-color' => get_option('block_description_color', '#d0d0d0'),
             '--ca-event-title-color' => get_option('ca_event_title_color', '#e63946'),
             '--card-background-color' => get_option('card_background_color', '#2c2f33'),
             '--button-foreground' => get_option('button_foreground', '#23272a'),
