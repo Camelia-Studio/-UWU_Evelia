@@ -4,7 +4,7 @@
  * Plugin Name:       Evelia
  * Plugin URI:        https://camelia-studio.org
  * Description:       A Plugin to manage events from Discord.
- * Version:           1.0.3
+ * Version:           1.0.4
  * Requires at least: 5.2
  * Requires PHP:      8.0
  * Author:            Camélia Studio
