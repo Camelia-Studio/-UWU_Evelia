@@ -53,8 +53,10 @@ class EveliaFrontend
         $buttonText = get_option('evelia_button_text', 'S\'inscrire !');
         $blockTitle = get_option('evelia_block_title', '');
         $blockDescription = get_option('evelia_block_description', '');
+        $cardLayout = get_option('evelia_card_layout', 'horizontal');
 
-        $html = '<div class="ca-calendar-container">';
+        $containerClass = $cardLayout === 'vertical' ? 'ca-calendar-container has-vertical-layout' : 'ca-calendar-container';
+        $html = '<div class="' . esc_attr($containerClass) . '">';
 
         // Afficher le titre si présent
         if (!empty($blockTitle)) {
@@ -71,7 +73,7 @@ class EveliaFrontend
             $date->setTimezone(new DateTimeZone('Europe/Paris'));
             $formattedDate = $date->format('d/m/Y H:i');
 
-            $html .= $this->render_single_event($event, $formattedDate, $discordBase, $buttonText);
+            $html .= $this->render_single_event($event, $formattedDate, $discordBase, $buttonText, $cardLayout);
         }
 
         $html .= '</div>';
@@ -81,11 +83,12 @@ class EveliaFrontend
     /**
      * Génère le HTML d'un événement
      */
-    private function render_single_event(array $event, string $formattedDate, string $discordBase, string $buttonText): string
+    private function render_single_event(array $event, string $formattedDate, string $discordBase, string $buttonText, string $cardLayout): string
     {
         $escapedButtonText = esc_html($buttonText);
+        $layoutClass = $cardLayout === 'vertical' ? ' vertical' : '';
         $html = <<<EOD
-<div class="ca-event-card">
+<div class="ca-event-card{$layoutClass}">
     <div class="ca-event-details">
         <div class="ca-event-date">
             <i class="fas fa-calendar-alt"></i> {$formattedDate}

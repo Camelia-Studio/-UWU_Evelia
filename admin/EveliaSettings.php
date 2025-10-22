@@ -8,6 +8,7 @@ class EveliaSettings {
     private array $colorsOptions;
     private array $discordOptions;
     private array $textOptions;
+    private array $layoutOptions;
 
     public function __construct() {
         $this->initOptions();
@@ -116,6 +117,18 @@ class EveliaSettings {
                 'type' => 'text',
             ],
         ];
+
+        $this->layoutOptions = [
+            'evelia_card_layout' => [
+                'value' => get_option('evelia_card_layout', 'horizontal'),
+                'label' => 'Mise en page des cartes d\'événements',
+                'type' => 'radio',
+                'options' => [
+                    'horizontal' => 'Horizontale (image à droite)',
+                    'vertical' => 'Verticale (image en haut)',
+                ],
+            ],
+        ];
     }
 
     /**
@@ -154,6 +167,15 @@ class EveliaSettings {
             }
         }
 
+        // Mettre à jour les options de mise en page
+        foreach ($this->layoutOptions as $optionName => $optionData) {
+            if (isset($_POST[$optionName])) {
+                $newValue = sanitize_text_field($_POST[$optionName]);
+                update_option($optionName, $newValue);
+                $this->layoutOptions[$optionName]['value'] = $newValue;
+            }
+        }
+
         echo '<div class="updated"><p>Options enregistrées avec succès !</p></div>';
     }
 
@@ -185,6 +207,9 @@ class EveliaSettings {
                     case 'textes':
                         $this->renderTextsSection();
                         break;
+                    case 'mise-en-page':
+                        $this->renderLayoutSection();
+                        break;
                     case 'configuration':
                     default:
                         $this->renderDiscordSection();
@@ -204,6 +229,7 @@ class EveliaSettings {
         $tabs = [
             'configuration' => 'Configuration',
             'textes' => 'Textes',
+            'mise-en-page' => 'Mise en page',
             'personnalisation' => 'Personnalisation',
         ];
         ?>
@@ -322,6 +348,179 @@ class EveliaSettings {
                     </td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                <th></th>
+                <td>
+                    <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <?php
+    }
+
+    /**
+     * Section mise en page
+     */
+    private function renderLayoutSection(): void
+    {
+        $currentLayout = get_option('evelia_card_layout', 'horizontal');
+        ?>
+        <h2 class="title">Mise en page des cartes d'événements</h2>
+        <p>Choisissez la disposition des cartes d'événements sur votre site.</p>
+
+        <style>
+            .layout-options {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+                margin: 2rem 0;
+            }
+            .layout-option {
+                border: 3px solid #ddd;
+                border-radius: 8px;
+                padding: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .layout-option:hover {
+                border-color: #2271b1;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            .layout-option.selected {
+                border-color: #2271b1;
+                background-color: #f0f6fc;
+            }
+            .layout-option input[type="radio"] {
+                margin-right: 0.5rem;
+            }
+            .layout-option label {
+                display: flex;
+                align-items: center;
+                font-weight: 600;
+                font-size: 16px;
+                margin-bottom: 1rem;
+                cursor: pointer;
+            }
+            .layout-preview {
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+            .preview-card-horizontal {
+                display: grid;
+                grid-template-columns: 1fr 120px;
+                gap: 1rem;
+                background: #2c2f33;
+                border-radius: 8px;
+                padding: 1rem;
+                color: #fff;
+            }
+            .preview-card-vertical {
+                display: flex;
+                flex-direction: column;
+                background: #2c2f33;
+                border-radius: 8px;
+                overflow: hidden;
+                color: #fff;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            .preview-image-horizontal {
+                width: 120px;
+                height: 80px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 4px;
+            }
+            .preview-image-vertical {
+                width: 100%;
+                height: 150px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            .preview-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .preview-content-vertical {
+                padding: 1rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .preview-date {
+                font-size: 12px;
+                color: #d0d0d0;
+            }
+            .preview-title {
+                font-weight: 600;
+                color: #e63946;
+            }
+            .preview-button {
+                background: #e63946;
+                color: #fff;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                border: none;
+                font-size: 12px;
+                margin-top: 0.5rem;
+                display: inline-block;
+                width: fit-content;
+            }
+        </style>
+
+        <div class="layout-options">
+            <div class="layout-option <?php echo $currentLayout === 'horizontal' ? 'selected' : ''; ?>"
+                 onclick="document.getElementById('layout-horizontal').checked = true; this.parentElement.querySelectorAll('.layout-option').forEach(el => el.classList.remove('selected')); this.classList.add('selected');">
+                <label for="layout-horizontal">
+                    <input type="radio"
+                           id="layout-horizontal"
+                           name="evelia_card_layout"
+                           value="horizontal"
+                           <?php checked($currentLayout, 'horizontal'); ?>>
+                    Mise en page horizontale
+                </label>
+                <p class="description">Image à droite, informations à gauche (mise en page actuelle)</p>
+                <div class="layout-preview">
+                    <div class="preview-card-horizontal">
+                        <div class="preview-content">
+                            <div class="preview-date">📅 25/12/2024 20:00</div>
+                            <div class="preview-title">Titre de l'événement</div>
+                            <button class="preview-button">S'inscrire !</button>
+                        </div>
+                        <div class="preview-image-horizontal"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layout-option <?php echo $currentLayout === 'vertical' ? 'selected' : ''; ?>"
+                 onclick="document.getElementById('layout-vertical').checked = true; this.parentElement.querySelectorAll('.layout-option').forEach(el => el.classList.remove('selected')); this.classList.add('selected');">
+                <label for="layout-vertical">
+                    <input type="radio"
+                           id="layout-vertical"
+                           name="evelia_card_layout"
+                           value="vertical"
+                           <?php checked($currentLayout, 'vertical'); ?>>
+                    Mise en page verticale
+                </label>
+                <p class="description">Image en haut, informations en dessous (format plus carré)</p>
+                <div class="layout-preview">
+                    <div class="preview-card-vertical">
+                        <div class="preview-image-vertical"></div>
+                        <div class="preview-content-vertical">
+                            <div class="preview-date">📅 25/12/2024 20:00</div>
+                            <div class="preview-title">Titre de l'événement</div>
+                            <button class="preview-button">S'inscrire !</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="form-table">
+            <tbody>
             <tr>
                 <th></th>
                 <td>

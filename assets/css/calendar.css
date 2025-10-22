@@ -30,12 +30,16 @@
 }
 
 .ca-calendar-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 1rem;
     background-color: var(--block-background-color);
     padding: 1.5rem;
     border-radius: 8px;
+}
+
+.ca-calendar-container.has-vertical-layout {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
 }
 
 .ca-calendar-title {
@@ -96,6 +100,27 @@
     margin-top: 0.5rem;
 }
 
+/* Mise en page verticale */
+.ca-event-card.vertical {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.ca-event-card.vertical .ca-event-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px 8px 0 0;
+    order: -1;
+    object-fit: cover;
+}
+
+.ca-calendar-container.has-vertical-layout .ca-calendar-title,
+.ca-calendar-container.has-vertical-layout .ca-calendar-description {
+    grid-column: 1 / -1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .ca-nav-container {
@@ -124,6 +149,10 @@
         font-size: 0.95rem;
     }
 
+    .ca-calendar-container.has-vertical-layout {
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+    }
+
     .ca-event-card {
         grid-template-columns: 1fr;
     }
@@ -149,6 +178,10 @@
 
     .ca-calendar-description {
         font-size: 0.9rem;
+    }
+
+    .ca-calendar-container.has-vertical-layout {
+        grid-template-columns: 1fr;
     }
 
     .ca-content-body {
