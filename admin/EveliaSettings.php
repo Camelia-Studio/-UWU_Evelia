@@ -115,14 +115,54 @@ class EveliaSettings {
     public function renderPage(): void
     {
         $this->processFormSubmission();
+        $activeTab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'configuration';
         ?>
         <div class="wrap">
             <h1>Configuration du plugin Evelia</h1>
+
+            <?php $this->renderTabs($activeTab); ?>
+
+            <style>
+                .nav-tab-wrapper {
+                    margin-bottom: 20px;
+                }
+            </style>
+
             <form method="post" action="">
-                <?php $this->renderDiscordSection(); ?>
-                <?php $this->renderColorsSection(); ?>
+                <?php
+                switch ($activeTab) {
+                    case 'personnalisation':
+                        $this->renderColorsSection();
+                        break;
+                    case 'configuration':
+                    default:
+                        $this->renderDiscordSection();
+                        break;
+                }
+                ?>
             </form>
         </div>
+        <?php
+    }
+
+    /**
+     * Affiche les onglets de navigation
+     */
+    private function renderTabs(string $activeTab): void
+    {
+        $tabs = [
+            'configuration' => 'Configuration',
+            'personnalisation' => 'Personnalisation',
+        ];
+        ?>
+        <nav class="nav-tab-wrapper">
+            <?php foreach ($tabs as $tabKey => $tabLabel): ?>
+                <a href="<?php echo esc_url(add_query_arg('tab', $tabKey)); ?>"
+                   class="nav-tab <?php echo $activeTab === $tabKey ? 'nav-tab-active' : ''; ?>">
+                    <?php echo esc_html($tabLabel); ?>
+                </a>
+            <?php endforeach; ?>
+        </nav>
         <?php
     }
 
@@ -151,6 +191,12 @@ class EveliaSettings {
                     </td>
                 </tr>
             <?php endforeach; ?>
+            <tr>
+                <th></th>
+                <td>
+                    <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
+                </td>
+            </tr>
             </tbody>
         </table>
         <?php
