@@ -7,6 +7,7 @@ class EveliaSettings {
 
     private array $colorsOptions;
     private array $discordOptions;
+    private array $textOptions;
 
     public function __construct() {
         $this->initOptions();
@@ -77,6 +78,19 @@ class EveliaSettings {
                 'type' => 'text',
             ],
         ];
+
+        $this->textOptions = [
+            'evelia_button_text' => [
+                'value' => get_option('evelia_button_text', 'S\'inscrire !'),
+                'label' => 'Texte du bouton d\'inscription',
+                'type' => 'text',
+            ],
+            'evelia_no_events_text' => [
+                'value' => get_option('evelia_no_events_text', 'Aucun évènement trouvé.'),
+                'label' => 'Message quand aucun évènement n\'est trouvé',
+                'type' => 'text',
+            ],
+        ];
     }
 
     /**
@@ -103,6 +117,15 @@ class EveliaSettings {
                 $newValue = sanitize_text_field($_POST[$optionName]);
                 update_option($optionName, $newValue);
                 $this->discordOptions[$optionName]['value'] = $newValue;
+            }
+        }
+
+        // Mettre à jour les options de textes
+        foreach ($this->textOptions as $optionName => $optionData) {
+            if (isset($_POST[$optionName])) {
+                $newValue = sanitize_text_field($_POST[$optionName]);
+                update_option($optionName, $newValue);
+                $this->textOptions[$optionName]['value'] = $newValue;
             }
         }
 
@@ -134,6 +157,9 @@ class EveliaSettings {
                     case 'personnalisation':
                         $this->renderColorsSection();
                         break;
+                    case 'textes':
+                        $this->renderTextsSection();
+                        break;
                     case 'configuration':
                     default:
                         $this->renderDiscordSection();
@@ -152,6 +178,7 @@ class EveliaSettings {
     {
         $tabs = [
             'configuration' => 'Configuration',
+            'textes' => 'Textes',
             'personnalisation' => 'Personnalisation',
         ];
         ?>
@@ -212,6 +239,42 @@ class EveliaSettings {
         <table class="form-table">
             <tbody>
             <?php foreach ($this->colorsOptions as $optionName => $optionData): ?>
+                <tr>
+                    <th>
+                        <label for="<?php echo esc_attr($optionName); ?>">
+                            <?php echo esc_html($optionData['label']); ?>
+                        </label>
+                    </th>
+                    <td>
+                        <input type="<?php echo esc_attr($optionData['type']); ?>"
+                               id="<?php echo esc_attr($optionName); ?>"
+                               name="<?php echo esc_attr($optionName); ?>"
+                               value="<?php echo esc_attr($optionData['value']); ?>"
+                               class="regular-text"/>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            <tr>
+                <th></th>
+                <td>
+                    <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <?php
+    }
+
+    /**
+     * Section textes
+     */
+    private function renderTextsSection(): void
+    {
+        ?>
+        <h2 class="title">Gestion des textes</h2>
+        <table class="form-table">
+            <tbody>
+            <?php foreach ($this->textOptions as $optionName => $optionData): ?>
                 <tr>
                     <th>
                         <label for="<?php echo esc_attr($optionName); ?>">

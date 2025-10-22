@@ -28,16 +28,17 @@ class EveliaFrontend
     public function eventsShortcode(): string
     {
         $discordBase = get_option('discord_invite_url', '');
+        $noEventsText = get_option('evelia_no_events_text', 'Aucun évènement trouvé.');
 
         if ('' === $discordBase) {
-            return '<p>Aucun évènement trouvé.</p>';
+            return '<p>' . esc_html($noEventsText) . '</p>';
         }
 
         $discord_api = EveliaDiscordApi::getInstance();
         $events = $discord_api->getEventsFromDiscord();
 
         if (sizeof($events) == 0) {
-            return '<p>Aucun évènement trouvé.</p>';
+            return '<p>' . esc_html($noEventsText) . '</p>';
         }
 
         return $this->renderEventsHtml($events, $discordBase);
@@ -49,6 +50,7 @@ class EveliaFrontend
      */
     private function renderEventsHtml(array $events, string $discordBase): string
     {
+        $buttonText = get_option('evelia_button_text', 'S\'inscrire !');
         $html = '<div class="ca-calendar-container">';
 
         foreach ($events as $event) {
@@ -56,7 +58,7 @@ class EveliaFrontend
             $date->setTimezone(new DateTimeZone('Europe/Paris'));
             $formattedDate = $date->format('d/m/Y H:i');
 
-            $html .= $this->render_single_event($event, $formattedDate, $discordBase);
+            $html .= $this->render_single_event($event, $formattedDate, $discordBase, $buttonText);
         }
 
         $html .= '</div>';
@@ -66,8 +68,9 @@ class EveliaFrontend
     /**
      * Génère le HTML d'un événement
      */
-    private function render_single_event(array $event, string $formattedDate, string $discordBase): string
+    private function render_single_event(array $event, string $formattedDate, string $discordBase, string $buttonText): string
     {
+        $escapedButtonText = esc_html($buttonText);
         $html = <<<EOD
 <div class="ca-event-card">
     <div class="ca-event-details">
@@ -79,7 +82,7 @@ class EveliaFrontend
         </div>
         <div class="ca-event-actions">
             <a href="$discordBase?event={$event['id']}" class="ca-btn" target="_blank">
-                <i class="fas fa-sign-in-alt"></i> S'inscrire !
+                <i class="fas fa-sign-in-alt"></i> {$escapedButtonText}
             </a>
         </div>
     </div>
