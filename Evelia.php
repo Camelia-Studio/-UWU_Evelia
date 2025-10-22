@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('EVELIA_VERSION', '1.0.3');
+define('EVELIA_VERSION', '1.0.4');
 define('EVELIA_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EVELIA_PLUGIN_URL', plugin_dir_url(__FILE__));
 
