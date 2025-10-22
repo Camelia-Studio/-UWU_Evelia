@@ -16,6 +16,20 @@ class EveliaDiscordApi
     }
 
     /**
+     * Normalise une chaîne en supprimant les accents et en convertissant en minuscules
+     */
+    private function normalizeString(string $text): string
+    {
+        // Convertir en minuscules
+        $text = mb_strtolower($text, 'UTF-8');
+
+        // Supprimer les accents
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+
+        return $text;
+    }
+
+    /**
      * Récupère les événements depuis l'API Discord
      */
     public function getEventsFromDiscord(): array
@@ -56,10 +70,15 @@ class EveliaDiscordApi
             return [];
         }
 
-        // Filtrer les événements qui contiennent le mot-clé
+        // Filtrer les événements qui contiennent le mot-clé (insensible à la casse et aux accents)
         if ('' !== $wordToSearch) {
-            $events = array_filter($events, function ($event) use ($wordToSearch) {
-                return stripos($event['description'], $wordToSearch) !== false;
+            $normalizedKeyword = $this->normalizeString($wordToSearch);
+            $events = array_filter($events, function ($event) use ($normalizedKeyword) {
+                if (!isset($event['description'])) {
+                    return false;
+                }
+                $normalizedDescription = $this->normalizeString($event['description']);
+                return strpos($normalizedDescription, $normalizedKeyword) !== false;
             });
         }
 
