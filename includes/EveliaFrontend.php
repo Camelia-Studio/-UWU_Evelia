@@ -52,7 +52,7 @@ class EveliaFrontend
             $finalText .= '<p>' . esc_html($noEventsText) . '</p>';
             $finalText .= '</div>'
 
-            return finalText;
+            return $finalText;
         }
 
         return $this->renderEventsHtml($events, $discordBase);
