@@ -38,7 +38,21 @@ class EveliaFrontend
         $events = $discord_api->getEventsFromDiscord();
 
         if (sizeof($events) == 0) {
-            return '<p>' . esc_html($noEventsText) . '</p>';
+            $finalText = '<div>';
+            
+            // Afficher le titre si présent
+            if (!empty($blockTitle)) {
+                $finalText .= '<h2 class="ca-calendar-title">' . esc_html($blockTitle) . '</h2>';
+            }
+
+            // Afficher la description si présente
+            if (!empty($blockDescription)) {
+                $finalText .= '<p class="ca-calendar-description">' . esc_html($blockDescription) . '</p>';
+            }
+            $finalText .= '<p>' . esc_html($noEventsText) . '</p>';
+            $finalText .= '</div>'
+
+            return finalText;
         }
 
         return $this->renderEventsHtml($events, $discordBase);
