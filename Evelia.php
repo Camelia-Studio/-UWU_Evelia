@@ -2,14 +2,14 @@
 
 /*
  * Plugin Name:       Evelia
- * Plugin URI:        https://camelia-studio.org
+ * Plugin URI:        https://git.crystalyx.net/camelia-studio/UWU_Evelia
  * Description:       A Plugin to manage events from Discord.
- * Version:           1.0.4
+ * Version:           1.0.5
  * Requires at least: 5.2
  * Requires PHP:      8.0
  * Author:            Camélia Studio
  * Author URI:        https://camelia-studio.org
- * License:          MIT
+ * License:           MIT
  * License URI:       https://opensource.org/license/mit
  * Text Domain:       evelia
  */
