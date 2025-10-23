@@ -29,6 +29,8 @@ class EveliaFrontend
     {
         $discordBase = get_option('discord_invite_url', '');
         $noEventsText = get_option('evelia_no_events_text', 'Aucun évènement trouvé.');
+        $blockTitle = get_option('evelia_block_title', '');
+        $blockDescription = get_option('evelia_block_description', '');
 
         if ('' === $discordBase) {
             return '<p>' . esc_html($noEventsText) . '</p>';
