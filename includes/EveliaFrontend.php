@@ -50,7 +50,7 @@ class EveliaFrontend
                 $finalText .= '<p class="ca-calendar-description">' . esc_html($blockDescription) . '</p>';
             }
             $finalText .= '<p>' . esc_html($noEventsText) . '</p>';
-            $finalText .= '</div>'
+            $finalText .= '</div>';
 
             return $finalText;
         }
