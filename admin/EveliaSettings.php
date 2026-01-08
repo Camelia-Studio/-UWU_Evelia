@@ -132,10 +132,21 @@ class EveliaSettings {
     }
 
     /**
-     * Traite la soumission du formulaire
+     * Traite la soumission du formulaire et les actions de cache
      */
     private function processFormSubmission(): void
     {
+        // Traiter l'invalidation manuelle du cache
+        if (isset($_POST['clear_cache'])) {
+            check_admin_referer('evelia_clear_cache');
+            
+            $discord_api = \EveliaDiscordApi::getInstance();
+            $discord_api->invalidateCache();
+            
+            echo '<div class="updated"><p>Cache vidé avec succès !</p></div>';
+            return;
+        }
+
         if (!isset($_POST['submit'])) {
             return;
         }
@@ -273,6 +284,9 @@ class EveliaSettings {
                 <th></th>
                 <td>
                     <input type="submit" name="submit" class="button button-primary" value="Enregistrer"/>
+                    <?php wp_nonce_field('evelia_clear_cache', 'evelia_clear_cache_nonce'); ?>
+                    <input type="submit" name="clear_cache" class="button button-secondary" value="Vider le cache" 
+                           onclick="return confirm('Êtes-vous sûr de vouloir vider le cache des événements ?');"/>
                 </td>
             </tr>
             </tbody>

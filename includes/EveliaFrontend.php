@@ -37,7 +37,7 @@ class EveliaFrontend
         }
 
         $discord_api = EveliaDiscordApi::getInstance();
-        $events = $discord_api->getEventsFromDiscord();
+        $events = $discord_api->getEventsFromDiscord(false);
 
         if (sizeof($events) == 0) {
             $finalText = '<div>';

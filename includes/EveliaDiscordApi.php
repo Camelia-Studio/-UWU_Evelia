@@ -30,9 +30,53 @@ class EveliaDiscordApi
     }
 
     /**
+     * Génère la clé de cache
+     */
+    private function getCacheKey(): string
+    {
+        $discordGuildId = get_option('discord_guild_id', '');
+        $wordToSearch = get_option('discord_word_to_search', '');
+        return 'evelia_events_cache_' . md5($discordGuildId . $wordToSearch);
+    }
+
+    /**
+     * Invalide le cache des événements
+     */
+    public function invalidateCache(): void
+    {
+        $cache_key = $this->getCacheKey();
+        delete_transient($cache_key);
+    }
+
+    /**
+     * Vérifie si les paramètres ont changé et invalide le cache si nécessaire
+     */
+    private function checkAndInvalidateCacheIfNeeded(): void
+    {
+        // Récupérer les paramètres actuels
+        $currentParams = [
+            'guild_id' => get_option('discord_guild_id', ''),
+            'word_to_search' => get_option('discord_word_to_search', ''),
+            'bot_token' => get_option('discord_bot_token', '')
+        ];
+
+        // Récupérer les paramètres stockés pour la dernière génération de cache
+        $last_params = get_option('evelia_last_cache_params', []);
+
+        // Comparer les paramètres
+        if ($last_params !== $currentParams) {
+            // Les paramètres ont changé, invalider le cache
+            $this->invalidateCache();
+            
+            // Mettre à jour les paramètres stockés
+            update_option('evelia_last_cache_params', $currentParams);
+        }
+    }
+
+    /**
      * Récupère les événements depuis l'API Discord
      */
-    public function getEventsFromDiscord(): array
+    public function getEventsFromDiscord(bool $forceRefresh = false): array
     {
         $discordBotToken = get_option('discord_bot_token', '');
         $discordGuildId = get_option('discord_guild_id', '');
@@ -42,8 +86,16 @@ class EveliaDiscordApi
             return [];
         }
 
-        $cache_key = 'evelia_events_cache_' . md5($discordGuildId . $wordToSearch);
+        $cache_key = $this->getCacheKey();
         $cache_duration = 12 * HOUR_IN_SECONDS; // 12 heures
+
+        // Vérifier si les paramètres ont changé
+        $this->checkAndInvalidateCacheIfNeeded();
+
+        // Forcer le rafraîchissement si demandé
+        if ($forceRefresh) {
+            $this->invalidateCache();
+        }
 
         // Vérifier si les données sont en cache
         $cached_data = get_transient($cache_key);
