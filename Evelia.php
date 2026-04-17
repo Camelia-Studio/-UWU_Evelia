@@ -11,7 +11,7 @@
  * Author URI:        https://camelia-studio.org
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       Evelia
+ * Text Domain:       evelia
  */
 
 // Sécurité : empêcher l'accès direct

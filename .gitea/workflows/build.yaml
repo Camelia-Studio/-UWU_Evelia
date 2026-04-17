@@ -56,7 +56,7 @@ jobs:
           fi
           
           # Copier d'autres fichiers optionnels s'ils existent
-          for file in README.md languages; do
+          for file in readme.txt README.md languages; do
             if [ -e "$file" ]; then
               cp -r "$file" "/tmp/$PLUGIN_SLUG/"
             fi

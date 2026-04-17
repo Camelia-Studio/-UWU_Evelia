@@ -198,7 +198,10 @@ class EveliaSettings {
     public function renderPage(): void
     {
         $this->processFormSubmission();
-        $activeTab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'configuration';
+        $activeTab = 'configuration';
+        if (isset($_GET['tab'], $_GET['_wpnonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'evelia_tab_navigation')) {
+            $activeTab = sanitize_text_field(wp_unslash($_GET['tab']));
+        }
         ?>
         <div class="wrap">
             <h1>Configuration du plugin Evelia</h1>
@@ -249,7 +252,7 @@ class EveliaSettings {
         ?>
         <nav class="nav-tab-wrapper">
             <?php foreach ($tabs as $tabKey => $tabLabel): ?>
-                <a href="<?php echo esc_url(add_query_arg('tab', $tabKey)); ?>"
+                <a href="<?php echo esc_url(wp_nonce_url(add_query_arg('tab', $tabKey), 'evelia_tab_navigation')); ?>"
                    class="nav-tab <?php echo $activeTab === $tabKey ? 'nav-tab-active' : ''; ?>">
                     <?php echo esc_html($tabLabel); ?>
                 </a>
