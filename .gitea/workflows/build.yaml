@@ -20,7 +20,7 @@ jobs:
         id: plugin_info
         run: |
           # Extraire les infos depuis Evelia.php
-          PLUGIN_SLUG="Evelia"
+          PLUGIN_SLUG="evelia"
           PLUGIN_VERSION=$(grep "Version:" Evelia.php | sed 's/.*Version: *//' | sed 's/ *$//' | tr -d '\r')
           
           echo "slug=$PLUGIN_SLUG" >> $GITHUB_OUTPUT

@@ -3,7 +3,7 @@ Contributors: cameliastudio
 Donate link: https://fr.tipeee.com/asso-camelia
 Tags: discord, events, calendar, shortcode, scheduled events
 Requires at least: 5.2
-Tested up to: 6.7
+Tested up to: 6.9
 Stable tag: 1.0.11
 Requires PHP: 8.0
 License: GPL-2.0-or-later
