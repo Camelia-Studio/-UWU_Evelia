@@ -41,11 +41,5 @@ class EveliaMain
 
     private function initHooks(): void
     {
-        add_action('init', array($this, 'loadTextdomain'));
-    }
-
-    public function loadTextdomain(): void
-    {
-        load_plugin_textdomain('evelia', false, dirname(plugin_basename(__FILE__)) . '/languages/');
     }
 }

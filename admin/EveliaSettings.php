@@ -151,10 +151,12 @@ class EveliaSettings {
             return;
         }
 
+        check_admin_referer('evelia_save_settings', 'evelia_settings_nonce');
+
         // Mettre à jour les options de couleur
         foreach ($this->colorsOptions as $optionName => $optionData) {
             if (isset($_POST[$optionName])) {
-                $newValue = sanitize_text_field($_POST[$optionName]);
+                $newValue = sanitize_text_field(wp_unslash($_POST[$optionName]));
                 update_option($optionName, $newValue);
                 $this->colorsOptions[$optionName]['value'] = $newValue;
             }
@@ -163,7 +165,7 @@ class EveliaSettings {
         // Mettre à jour les options Discord
         foreach ($this->discordOptions as $optionName => $optionData) {
             if (isset($_POST[$optionName])) {
-                $newValue = sanitize_text_field($_POST[$optionName]);
+                $newValue = sanitize_text_field(wp_unslash($_POST[$optionName]));
                 update_option($optionName, $newValue);
                 $this->discordOptions[$optionName]['value'] = $newValue;
             }
@@ -172,7 +174,7 @@ class EveliaSettings {
         // Mettre à jour les options de textes
         foreach ($this->textOptions as $optionName => $optionData) {
             if (isset($_POST[$optionName])) {
-                $newValue = sanitize_text_field($_POST[$optionName]);
+                $newValue = sanitize_text_field(wp_unslash($_POST[$optionName]));
                 update_option($optionName, $newValue);
                 $this->textOptions[$optionName]['value'] = $newValue;
             }
@@ -181,7 +183,7 @@ class EveliaSettings {
         // Mettre à jour les options de mise en page
         foreach ($this->layoutOptions as $optionName => $optionData) {
             if (isset($_POST[$optionName])) {
-                $newValue = sanitize_text_field($_POST[$optionName]);
+                $newValue = sanitize_text_field(wp_unslash($_POST[$optionName]));
                 update_option($optionName, $newValue);
                 $this->layoutOptions[$optionName]['value'] = $newValue;
             }
@@ -196,7 +198,7 @@ class EveliaSettings {
     public function renderPage(): void
     {
         $this->processFormSubmission();
-        $activeTab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'configuration';
+        $activeTab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])) : 'configuration';
         ?>
         <div class="wrap">
             <h1>Configuration du plugin Evelia</h1>
@@ -210,6 +212,7 @@ class EveliaSettings {
             </style>
 
             <form method="post" action="">
+                <?php wp_nonce_field('evelia_save_settings', 'evelia_settings_nonce'); ?>
                 <?php
                 switch ($activeTab) {
                     case 'personnalisation':
@@ -416,9 +419,7 @@ class EveliaSettings {
                                 </a>
                             </div>
                         </div>
-                        <img src="https://camelia-studio.org/wp-content/uploads/2025/07/1080JPEG.jpg"
-                             alt="Exemple"
-                             class="ca-event-image" />
+                        <div class="ca-event-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 80px;"></div>
                     </div>
                 </div>
             </div>

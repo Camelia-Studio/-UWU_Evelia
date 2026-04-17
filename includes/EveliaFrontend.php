@@ -103,27 +103,23 @@ class EveliaFrontend
     {
         $escapedButtonText = esc_html($buttonText);
         $layoutClass = $cardLayout === 'vertical' ? ' vertical' : '';
-        $html = <<<EOD
-<div class="ca-event-card{$layoutClass}">
-    <div class="ca-event-details">
-        <div class="ca-event-date">
-            <i class="fas fa-calendar-alt"></i> {$formattedDate}
-        </div>
-        <div class="ca-event-title">
-            {$event['name']}
-        </div>
-        <div class="ca-event-actions">
-            <a href="$discordBase?event={$event['id']}" class="ca-btn" target="_blank">
-                <i class="fas fa-sign-in-alt"></i> {$escapedButtonText}
-            </a>
-        </div>
-    </div>
-EOD;
+        $html = '<div class="ca-event-card' . esc_attr($layoutClass) . '">'
+            . '<div class="ca-event-details">'
+            . '<div class="ca-event-date">'
+            . '<i class="fas fa-calendar-alt"></i> ' . esc_html($formattedDate)
+            . '</div>'
+            . '<div class="ca-event-title">'
+            . esc_html($event['name'])
+            . '</div>'
+            . '<div class="ca-event-actions">'
+            . '<a href="' . esc_url($discordBase . '?event=' . $event['id']) . '" class="ca-btn" target="_blank">'
+            . '<i class="fas fa-sign-in-alt"></i> ' . $escapedButtonText
+            . '</a>'
+            . '</div>'
+            . '</div>';
 
         if (!empty($event['image'])) {
-            $html .= <<<EOD
-    <img src="https://cdn.discordapp.com/guild-events/{$event['id']}/{$event['image']}.png?size=256" alt="{$event['name']}" class="ca-event-image" />
-EOD;
+            $html .= '<img src="' . esc_url('https://cdn.discordapp.com/guild-events/' . $event['id'] . '/' . $event['image'] . '.png?size=256') . '" alt="' . esc_attr($event['name']) . '" class="ca-event-image" />';
         }
 
         $html .= '</div>';
